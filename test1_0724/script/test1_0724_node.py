@@ -6,6 +6,12 @@ from cv_bridge import CvBridge
 import numpy as np
 import time
 import math
+import glob
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from CameraCalibrator import Calibrator
 
 class Control_pub():
     def __init__(self):
@@ -24,13 +30,25 @@ class Control_pub():
         self.speed_msg = Float64()
         self.rate = rospy.Rate(1)
 
+        self.mtx, self.dist = calibrate_camera('/home/carol/ws/src/test1_0724/script/calib_img')
+        
+        self.src_pts = np.float32([[80, 480], [260, 290], [380, 290], [560, 480]])
+        self.dst_pts = np.float32([[100, 480],[100, 0],[540, 0],[540, 480]])
+
     def image_callback(self, data):
         self.img = self.bridge.compressed_imgmsg_to_cv2(data, "bgr8")
 
     def callback(self):
         if self.img is None:
             return
-        filtered_img = filter_color(self.img)
+        undistorted = cv2.undistort(self.img, self.mtx, self.dist, None, self.mtx)
+        bird_img = warp_perspective(undistorted, self.src_pts, self.dst_pts)
+        cv2.imshow("bird",bird_img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        
+        filtered_img = filter_color(bird_img)
         roi_img, roi_size = roi(filtered_img)
         rightbase, leftbase = plothistogram(roi_img)
         out_img, heading_point = sliding_window(roi_img, rightbase, leftbase)
@@ -46,6 +64,33 @@ def main():
     control = Control_pub()
     while not rospy.is_shutdown():
         control.callback()
+        cv2.destroyAllWindows()
+
+def calibrate_camera(calib_img_folder='/home/carol/ws/src/test1_0724/script/calib_img', pattern_size=(9,6)):
+    obj_pt = np.zeros((pattern_size[0]*pattern_size[1], 3), np.float32)
+    obj_pt[:, :2] = np.mgrid[0:pattern_size[0], 0:pattern_size[1]].T.reshape(-1, 2)
+    
+    obj_pts, img_pts = [], []
+    imgs = glob.glob(f'{calib_img_folder}/calib*.jpg')
+
+    for path in imgs:
+        img = cv2.imread(path)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        ret, corners = cv2.findChessboardCorners(gray, pattern_size, None)
+        if ret:
+            obj_pts.append(obj_pt)
+            img_pts.append(corners)
+
+    img = cv2.imread('/home/carol/ws/src/test1_0724/script/calib_img/calib5.jpg')
+    img_size = (img.shape[1], img.shape[0])
+    _, mtx, dist, _, _ = cv2.calibrateCamera(obj_pts, img_pts, img_size, None, None)
+    return mtx, dist
+
+def warp_perspective(img, src_points, dst_points):
+    h, w = img.shape[:2]
+    M = cv2.getPerspectiveTransform(np.float32(src_points), np.float32(dst_points))
+    warped = cv2.warpPerspective(img, M, (w, h), flags=cv2.INTER_LINEAR)
+    return warped
 
 def filter_color(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -56,9 +101,9 @@ def filter_color(img):
     filtered_img = cv2.inRange(hsv, lower_white, upper_white)
     
     cv2.imshow("Binary Image", filtered_img)
-    cv2.waitKey(1)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    # cv2.waitKey(1)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     return filtered_img
 
@@ -78,6 +123,8 @@ def roi(filtered_img):
     roi_point = np.array([[bottom_left, bottom_right, top_right, top_left]], dtype=np.int32)
     cv2.fillConvexPoly(mask, roi_point, 255)
     roi_img = cv2.bitwise_and(filtered_img, mask)
+
+    print(f"roi_point: {roi_point}")
 
     cv2.imshow("roi_img", roi_img)
     cv2.waitKey(1)
@@ -228,7 +275,7 @@ def sliding_window(roi_img, rightbase, leftbase):
         
         return out_img
     
-    else: #(len(leftx) != 0 & len(rightx) != 0):
+    else: #(len(leftx) != 0 and len(rightx) != 0):
         left_fit = np.polyfit(lefty, leftx, 2)
         right_fit = np.polyfit(righty, rightx, 2)
 
