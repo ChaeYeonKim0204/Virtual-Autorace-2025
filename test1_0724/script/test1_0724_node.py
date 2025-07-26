@@ -6,19 +6,13 @@ from cv_bridge import CvBridge
 import numpy as np
 import time
 import math
-import glob
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from CameraCalibrator import Calibrator
 
 class Control_pub():
     def __init__(self):
         rospy.init_node("control_pub_node")
         # 카메라 이미지 구독
         self.steer_pub = rospy.Publisher("/commands/servo/position", Float64, queue_size = 10)
-        self.speed_pub = rospy.Publisher("/commands/moter/speed", Float64, queue_size = 10)
+        self.speed_pub = rospy.Publisher("/commands/motor/speed", Float64, queue_size = 10)
         self.img = None
         self.sub = rospy.Subscriber("/image_jpeg/compressed", CompressedImage, self.image_callback)
         self.bridge = CvBridge()
@@ -29,11 +23,22 @@ class Control_pub():
         self.steer_msg = Float64()
         self.speed_msg = Float64()
         self.rate = rospy.Rate(1)
-
-        self.mtx, self.dist = calibrate_camera('/home/carol/ws/src/test1_0724/script/calib_img')
         
-        self.src_pts = np.float32([[80, 480], [260, 290], [380, 290], [560, 480]])
-        self.dst_pts = np.float32([[100, 480],[100, 0],[540, 0],[540, 480]])
+        # 📷 실제 영상에서 사다리꼴 모양으로 차선 포함 영역 넓게 지정
+        self.src_pts = np.float32([
+            [50, 460],     # 왼쪽 아래
+            [160, 320],    # 왼쪽 위
+            [480, 320],    # 오른쪽 위
+            [590, 460]     # 오른쪽 아래
+        ])
+
+        # 📐 변환 후에도 영상 전체를 너무 꽉 채우지 않도록 여유 있게 설정
+        self.dst_pts = np.float32([
+            [100, 460],    # 왼쪽 아래
+            [100, 0],      # 왼쪽 위
+            [540, 0],      # 오른쪽 위
+            [540, 460]     # 오른쪽 아래
+        ])
 
     def image_callback(self, data):
         self.img = self.bridge.compressed_imgmsg_to_cv2(data, "bgr8")
@@ -41,18 +46,18 @@ class Control_pub():
     def callback(self):
         if self.img is None:
             return
-        undistorted = cv2.undistort(self.img, self.mtx, self.dist, None, self.mtx)
-        bird_img = warp_perspective(undistorted, self.src_pts, self.dst_pts)
+        # undistorted = cv2.undistort(self.img, self.mtx, self.dist, None, self.mtx)
+        bird_img = warp_perspective(self.img, self.src_pts, self.dst_pts)
+
         cv2.imshow("bird",bird_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-        
         filtered_img = filter_color(bird_img)
-        roi_img, roi_size = roi(filtered_img)
+        roi_img = filtered_img
         rightbase, leftbase = plothistogram(roi_img)
-        out_img, heading_point = sliding_window(roi_img, rightbase, leftbase)
-        steering_angle = get_steering_angle(filtered_img, heading_point)
+        out_img, center_fitx = sliding_window(roi_img, rightbase, leftbase)
+        steering_angle = get_steering_angle(filtered_img, center_fitx)
         steering, throttle, self.last_error, self.last_time = compute_pd_control(steering_angle, self.last_error, self.last_time)
         self.speed_msg.data = throttle
         self.steer_msg.data = steering
@@ -65,26 +70,6 @@ def main():
     while not rospy.is_shutdown():
         control.callback()
         cv2.destroyAllWindows()
-
-def calibrate_camera(calib_img_folder='/home/carol/ws/src/test1_0724/script/calib_img', pattern_size=(9,6)):
-    obj_pt = np.zeros((pattern_size[0]*pattern_size[1], 3), np.float32)
-    obj_pt[:, :2] = np.mgrid[0:pattern_size[0], 0:pattern_size[1]].T.reshape(-1, 2)
-    
-    obj_pts, img_pts = [], []
-    imgs = glob.glob(f'{calib_img_folder}/calib*.jpg')
-
-    for path in imgs:
-        img = cv2.imread(path)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, corners = cv2.findChessboardCorners(gray, pattern_size, None)
-        if ret:
-            obj_pts.append(obj_pt)
-            img_pts.append(corners)
-
-    img = cv2.imread('/home/carol/ws/src/test1_0724/script/calib_img/calib5.jpg')
-    img_size = (img.shape[1], img.shape[0])
-    _, mtx, dist, _, _ = cv2.calibrateCamera(obj_pts, img_pts, img_size, None, None)
-    return mtx, dist
 
 def warp_perspective(img, src_points, dst_points):
     h, w = img.shape[:2]
@@ -107,30 +92,30 @@ def filter_color(img):
 
     return filtered_img
 
-def roi(filtered_img):
-    height, width = filtered_img.shape[:2]
-    x_center = width / 2
+# def roi(filtered_img):
+#     height, width = filtered_img.shape[:2]
+#     x_center = width / 2
         
-    mask = np.zeros_like(filtered_img)
-    trap_bottom_width = 1
-    trap_top_width = 0.65
-    trap_height = 0.85
+#     mask = np.zeros_like(filtered_img)
+#     trap_bottom_width = 1
+#     trap_top_width = 0.65
+#     trap_height = 0.85
         
-    bottom_left = (int(width * (0.5 - trap_bottom_width / 2)), height)
-    bottom_right = (int(width * (0.5 + trap_bottom_width / 2)), height)
-    top_left = (int(width * (0.5 - trap_top_width / 2)), int(height * (1 - trap_height)))
-    top_right = (int(width * (0.5 + trap_top_width / 2)), int(height * (1 - trap_height)))
-    roi_point = np.array([[bottom_left, bottom_right, top_right, top_left]], dtype=np.int32)
-    cv2.fillConvexPoly(mask, roi_point, 255)
-    roi_img = cv2.bitwise_and(filtered_img, mask)
+#     bottom_left = (int(width * (0.5 - trap_bottom_width / 2)), height)
+#     bottom_right = (int(width * (0.5 + trap_bottom_width / 2)), height)
+#     top_left = (int(width * (0.5 - trap_top_width / 2)), int(height * (1 - trap_height)))
+#     top_right = (int(width * (0.5 + trap_top_width / 2)), int(height * (1 - trap_height)))
+#     roi_point = np.array([[bottom_left, bottom_right, top_right, top_left]], dtype=np.int32)
+#     cv2.fillConvexPoly(mask, roi_point, 255)
+#     roi_img = cv2.bitwise_and(filtered_img, mask)
 
-    print(f"roi_point: {roi_point}")
+#     print(f"roi_point: {roi_point}")
 
-    cv2.imshow("roi_img", roi_img)
-    cv2.waitKey(1)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    return roi_img, [bottom_left, bottom_right, top_left, top_right]
+#     cv2.imshow("roi_img", roi_img)
+#     cv2.waitKey(1)
+#     # cv2.waitKey(0)
+#     # cv2.destroyAllWindows()
+#     return roi_img, [bottom_left, bottom_right, top_left, top_right]
 
 
 def plothistogram(roi_img):
@@ -301,18 +286,21 @@ def sliding_window(roi_img, rightbase, leftbase):
             cv2.line(out_img, pt1, pt2, (0, 255, 0), 3)  # 녹색으로 중앙선 표시
             # cv2.line(out_img, (center_fitx[0],roi_img.shape[0]//2), (center_fitx[0],roi_img.shape[0]//2), (255, 255, 0), 3)
         cv2.imshow("center_line", out_img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         print(f"중앙점: {center_fitx[0]}")
         return out_img, center_fitx[0]
     
-def get_steering_angle(filtered_img, heading_point):
+def get_steering_angle(filtered_img, center_fitx):
     height, width = filtered_img.shape[:2]
     mid = width // 2
-    x_offset = heading_point - mid
+    x_offset = center_fitx - mid
     y_offset =  height // 2
     steering_angle_radian = math.atan2(x_offset, y_offset)
     steering_angel_deg = steering_angle_radian / math.pi * 180
     steering_angle = 90 - steering_angel_deg
+    print(f"{height}, {width}")
     return steering_angle
 
 def compute_pd_control(steering_angle, last_error, last_time, kp=0.4, kd_ratio=0.65, base_speed=0.3):
