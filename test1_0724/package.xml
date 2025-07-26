@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>test1_0724</name>
+  <version>0.0.0</version>
+  <description>The test1_0724 package</description>
+
+  <maintainer email="carol@todo.todo">carol</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python-setuptools</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <exec_depend>rospy</exec_depend>
+
+  <!-- export 태그 제거 or 비워두기 -->
+</package>
