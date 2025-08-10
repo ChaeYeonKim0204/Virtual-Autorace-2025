@@ -1,8 +1,14 @@
 <launch>
     <!--load map-->
-    <arg name="map_file" default="$(find wego)/map/maps/map.yaml"/>
+    <arg name="map_file" default="$(find wego)/maps/map.yaml"/>
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
 
     <!--localization-->
     <include file="$(find wego_2d_nav)/launch/amcl.launch"/>
+
+    <!-- move base-->
+    <include file="$(find wego_2d_nav)/launch/move_base.launch"/>
+
+
+    <node pkg="wego" type="navigation_client.py" name="navigation_client"/>
 </launch>

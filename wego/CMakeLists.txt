@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   sensor_msgs
+  move_base_msgs
+  actionlib_msgs
 )
 
 
@@ -28,3 +30,9 @@ include_directories(
 add_executable(convert_lidar src/convert_lidar.cpp)
 
 target_link_libraries(convert_lidar ${catkin_LIBRARIES})
+
+catkin_install_python(
+  PROGRAMS
+    scripts/navigation_client.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

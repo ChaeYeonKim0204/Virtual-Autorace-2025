@@ -7,7 +7,7 @@ import tf2_ros
 class PubTF:
     def __init__(self):
         rospy.init_node("odom_tf_broadcast",anonymous=True)
-        self.br = tf2_ros.TransformBraodcaster()
+        self.br = tf2_ros.TransformBroadcaster()
         self.t = TransformStamped()
         rospy.Subscriber("odom",Odometry, self.callback)
 
