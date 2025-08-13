@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.1)
 project(teb_local_planner)
 
+set(G2O_INCLUDE_DIR /opt/ros/noetic/include)
+set(G2O_LIBRARIES
+  /opt/ros/noetic/lib/libg2o_core.so
+  /opt/ros/noetic/lib/libg2o_stuff.so
+  /opt/ros/noetic/lib/libg2o_csparse_extension.so
+  /opt/ros/noetic/lib/libg2o_types_slam3d.so
+  # 필요한 다른 g2o 라이브러리들
+)
+
+
 # Set to Release in order to speed up the program significantly
 set(CMAKE_BUILD_TYPE Release) #None, Debug, Release, RelWithDebInfo, MinSizeRel
 
@@ -47,8 +57,12 @@ elseif (EXISTS "FindEigen.cmake")
   e.g. by adding it to ${PROJECT_SOURCE_DIR}/cmake_modules.")
 endif (EXISTS "FindEigen3.cmake")
 
+#set(EXTERNAL_INCLUDE_DIRS ${Eigen_INCLUDE_DIRS} ${SUITESPARSE_INCLUDE_DIRS} ${G2O_INCLUDE_DIRS})
+#set(EXTERNAL_LIBS ${SUITESPARSE_LIBRARIES} ${G2O_LIBRARIES})
 set(EXTERNAL_INCLUDE_DIRS ${Eigen_INCLUDE_DIRS} ${SUITESPARSE_INCLUDE_DIRS} ${G2O_INCLUDE_DIR})
 set(EXTERNAL_LIBS ${SUITESPARSE_LIBRARIES} ${G2O_LIBRARIES})
+
+
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed

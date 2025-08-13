@@ -1,7 +1,7 @@
 
 # erpm (electrical rpm) = speed_to_erpm_gain * speed (meters / second) + speed_to_erpm_offset
 # for offset=0. speed_to_erpm_gain = num_motor_poles*60/circumference_wheel_in_meters
-speed_to_erpm_gain: 1000
+speed_to_erpm_gain: 980
 speed_to_erpm_offset: 0.0
 
 tachometer_ticks_to_meters_gain: 0.00225
@@ -18,7 +18,7 @@ steering_angle_to_servo_gain: -1.470588235
 steering_angle_to_servo_offset: 0.5
 
 # publish odom to base link tf
-vesc_to_odom/publish_tf: false
+vesc_to_odom/publish_tf: true
 
 # car wheelbase is about 25cm 
 wheelbase: .26
@@ -29,10 +29,10 @@ vesc_driver:
   duty_cycle_max: 0.0
   current_min: 0.0
   current_max: 20.0
-  brake_min: -20000.0
-  brake_max: 200000.0
-  speed_min: -20000.0
-  speed_max: 20000.0
+  brake_min: -40000.0
+  brake_max: 400000.0
+  speed_min: -40000.0
+  speed_max: 40000.0
   position_min: 0.0
   position_max: 0.0
   servo_min: 0.0

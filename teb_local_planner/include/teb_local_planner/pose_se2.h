@@ -46,6 +46,16 @@
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_datatypes.h>
 
+// namespace g2o {
+//   inline double average_angle(double angle1, double angle2) {
+//     double diff = angle2 - angle1;
+//     while (diff > M_PI) diff -= 2*M_PI;
+//     while (diff < -M_PI) diff += 2*M_PI;
+//     return angle1 + diff * 0.5;
+//   }
+// }
+
+
 namespace teb_local_planner
 {
 

@@ -14,11 +14,12 @@
     
 
     <!-- about odom-->
-    <group if = "$(arg ekf)">
+    <!-- <group if = "$(arg ekf)">
         <include file="$(find robot_localization)/launch/dual_ekf_navsat_example.launch"/>
     </group>
-    
+     -->
     <group if = "$(arg ekf)">
         <node pkg="wego" type="pub_odom.py" name="pub_odom"/>
     </group>
+
 </launch>

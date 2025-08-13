@@ -15,6 +15,8 @@ class PubTF:
     def callback(self, msg):
         self.t.header.frame_id = "odom"
         self.t.header.stamp = rospy.Time.now()
+        # self.t.header.stamp = msg.header.stamp
+
         self.t.child_frame_id = msg.child_frame_id
         self.t.transform.translation.x = msg.pose.pose.position.x
         self.t.transform.translation.y = msg.pose.pose.position.y

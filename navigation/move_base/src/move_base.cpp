@@ -30,7 +30,15 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
+*  POS
+        # self.waypoint1 = MoveBaseGoal()
+        # self.waypoint1.target_pose.header.frame_id = 'map'
+        # self.waypoint1.target_pose.pose.position.x = 0.024845656602266952
+        # self.waypoint1.target_pose.pose.position.y = -0.016559474250307026
+        # self.waypoint1.target_pose.pose.orientation.w = 0.005685134412241484
+        # self.waypoint1.target_pose.pose.orientation.z = 0.9999838394927764
+
+        # self.goal_list.append(self.waypoint1)SIBILITY OF SUCH DAMAGE.
 *
 * Author: Eitan Marder-Eppstein
 *         Mike Phillips (put the planner in its own thread)

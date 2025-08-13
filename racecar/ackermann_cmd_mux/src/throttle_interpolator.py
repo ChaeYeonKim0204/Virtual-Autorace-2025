@@ -42,7 +42,6 @@ class InterpolateThrottle:
         
         rospy.Subscriber(self.rpm_input_topic, Float64, self._process_throttle_command)
         rospy.Subscriber(self.servo_input_topic, Float64, self._process_servo_command)
-
         self.max_delta_servo = abs(self.steering_angle_to_servo_gain * self.max_servo_speed / self.servo_smoother_rate)
         rospy.Timer(rospy.Duration(1.0/self.servo_smoother_rate), self._publish_servo_command)
 
@@ -67,6 +66,8 @@ class InterpolateThrottle:
             
     def _process_throttle_command(self,msg):
         input_rpm = msg.data
+        if abs(input_rpm )> 100:
+            input_rpm = msg.data * 5.0
         # Do some sanity clipping
         input_rpm = min(max(input_rpm, self.min_rpm), self.max_rpm)
         self.desired_rpm = input_rpm
