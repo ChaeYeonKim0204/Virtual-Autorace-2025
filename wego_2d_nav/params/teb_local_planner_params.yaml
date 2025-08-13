@@ -7,11 +7,11 @@ TebLocalPlannerRos:
   dt_ref: 0.3
   dt_hysteresis: 0.1
   global_plan_overwrite_orientation: True
-  max_global_plan_lookahead_dist: 1.5
+  max_global_plan_lookahead_dist: 2.0
   feasibility_check_no_poses: 5
 
-  max_vel_x: 1.5
-  max_vel_x_backwards: 1.5
+  max_vel_x: 2.0
+  max_vel_x_backwards: 2.0
   max_vel_theta: 0.5
   acc_lim_x: 2
   acc_lim_theta: 2
@@ -34,10 +34,10 @@ TebLocalPlannerRos:
   yaw_goal_tolerance: 0.3
   free_goal_vel: True
 
-  min_obstacle_dist: 0.4
+  min_obstacle_dist: 0.6
   include_costmap_obstacles: True
-  costmap_obstacles_behind_robot_dist: 1.0
-  obstacle_poses_affected: 20
+  costmap_obstacles_behind_robot_dist: 0.7
+  obstacle_poses_affected: 15
   costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
   costmap_converter_spin_thread: True
   costmap_converter_rate: 5
