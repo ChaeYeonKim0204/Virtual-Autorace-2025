@@ -14,8 +14,8 @@
         <param name="planner_patience" value="5.0"/>
 
         <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
-        <!-- <rosparam file="$(find wego_2d_nav)/params/teb_local_planner_params.yaml" command="load"/> -->
-        <rosparam file="$(find wego_2d_nav)/params/teb_local_planner_params.yaml" command="load" ns="TebLocalPlannerROS"/>
+        <rosparam file="$(find wego_2d_nav)/params/teb_local_planner_params.yaml" command="load"/>
+        <!-- <rosparam file="$(find wego_2d_nav)/params/teb_local_planner_params.yaml" command="load" ns="TebLocalPlannerROS"/> -->
         <param name="controller_frequency" value="5.0"/>
         <param name="controller_patience" value="7.0"/>
 
