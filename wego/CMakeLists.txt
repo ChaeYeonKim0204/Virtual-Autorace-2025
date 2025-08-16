@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES tf_pkg
+#  LIBRARIES wego
 #  CATKIN_DEPENDS roscpp rospy
 #  DEPENDS system_lib
 )
@@ -26,7 +26,9 @@ include_directories(
 
 
 add_executable(lidar_convert src/convert_lidar.cpp)
-
-
 target_link_libraries(lidar_convert ${catkin_LIBRARIES})
 
+catkin_install_python(PROGRAMS
+  scripts/pub_odom.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
