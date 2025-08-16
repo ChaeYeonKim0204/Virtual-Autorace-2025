@@ -11,7 +11,7 @@ TebLocalPlannerRos:
   feasibility_check_no_poses: 5
 
   max_vel_x: 2.0
-  max_vel_x_backwards: 2.0
+  max_vel_x_backwards: 1.0
   max_vel_theta: 0.5
   acc_lim_x: 2
   acc_lim_theta: 2
@@ -30,11 +30,11 @@ TebLocalPlannerRos:
     vertices: [[-0.1, -0.1], [-0.1, 0.1], [0.3, 0.1], [0.3, -0.1]]
     # vertices: [[0.25, -0.05], [0.18, -0.05], [0.18, -0.18], [-0.19, -0.18], [-0.25,0], [-0.19, 0.18],[0.18,0.18],[0.18,0.05],[0.25,0.05]]
 
-  xy_goal_tolerance: 0.3
-  yaw_goal_tolerance: 0.3
-  free_goal_vel: True
+  xy_goal_tolerance: 0.15
+  yaw_goal_tolerance: 0.2
+  free_goal_vel: false
 
-  min_obstacle_dist: 0.6
+  min_obstacle_dist: 0.25
   include_costmap_obstacles: True
   costmap_obstacles_behind_robot_dist: 0.7
   obstacle_poses_affected: 15
@@ -53,5 +53,33 @@ TebLocalPlannerRos:
   weight_acc_lim_x: 1
   weight_acc_lim_theta: 1
   weight_kinematics_nh: 1000
-  weight_kinematics_forward_drive: 1  
-  
+  weight_kinematics_forward_drive: 1 
+
+
+# # ======내가 추가한via-points 설정=======
+# global_plan_viapoint_sep: -1.0
+# # 커스텀 via-points 가중치 => 차선 추종 강도 조절
+# weight_viapoint: 8.0
+
+# # Via-points와 관련된 추가 설정들
+# via_points_ordered: True  # via-points 순서 유지
+      
+# # 경로 추종 관련 가중치 조정
+# weight_optimaltime: 1.0        # 시간 최적화 가중치 (낮춤)
+# weight_shortest_path: 0.0      # 최단 경로 가중치 (비활성화)
+# weight_obstacle: 50.0          # 장애물 회피 가중치
+# weight_inflation: 0.1          # 팽창 가중치
+      
+# # 동적 장애물 관련 설정 (차선 추종 시 유용)
+# weight_dynamic_obstacle: 10.0
+# weight_dynamic_obstacle_inflation: 0.2
+      
+# # 경로 스무딩 관련
+# weight_kinematics_turning_radius: 1.0
+      
+# # 안전 관련 설정
+# enable_homotopy_class_planning: False  # 단일 경로로 제한 (차선 추종 시 안정성)
+# enable_multithreading: True
+      
+# # 최적화 관련 세부 설정
+# weight_adapt_factor: 2.0

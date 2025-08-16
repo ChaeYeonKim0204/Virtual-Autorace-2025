@@ -1,0 +1,58 @@
+<!-- <launch>
+  <!-- Arguments -->
+  <arg name="enable_lane_following" default="true"/>
+  <arg name="lane_update_rate" default="10.0"/>
+  <arg name="max_via_points" default="10"/>
+  
+  <!-- 기존 Navigation Stack 실행 -->
+  <include file="$(find wego_2d_nav)/launch/amcl.launch"/>
+  
+  <!-- Move Base with TEB Local Planner -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <!-- 기존 파라미터 파일들 로드 -->
+    <rosparam file="$(find wego_2d_nav)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find wego_2d_nav)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find wego_2d_nav)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find wego_2d_nav)/param/global_costmap_params.yaml" command="load" />
+    
+    <!-- TEB Local Planner 파라미터 (차선 추종 설정 포함) -->
+    <rosparam file="$(find wego_2d_nav)/param/teb_local_planner_params.yaml" command="load" />
+    
+    <!-- Local Planner 설정 -->
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+    <param name="planner_frequency" value="1.0" />
+    <param name="planner_patience" value="5.0" />
+    
+    <param name="controller_frequency" value="10.0" />
+    <param name="controller_patience" value="3.0" />
+    
+    <param name="conservative_reset_dist" value="3.0" />
+    <param name="recovery_behavior_enabled" value="false" />
+    <param name="clearing_rotation_allowed" value="false" />
+  </node>
+  
+  <!-- 기존 Ackermann 변환 노드 -->
+  <node pkg="wego_2d_nav" 
+        type="cmd_vel_to_ackermann.py" 
+        name="cmd_vel_to_ackermann" 
+        output="screen"/>
+  
+  <!-- 차선 Via-Points 발행 노드 -->
+  <node pkg="wego_2d_nav" 
+        type="lane_via_points_publisher.py" 
+        name="lane_via_points_publisher" 
+        output="screen"
+        if="$(arg enable_lane_following)">
+    
+    <!-- 파라미터 설정 -->
+    <param name="update_rate" value="$(arg lane_update_rate)"/>
+    <param name="enable_via_points" value="true"/>
+    <param name="max_via_points" value="$(arg max_via_points)"/>
+    <param name="via_point_spacing" value="1.0"/>
+    
+    <!-- 차선 검출 관련 파라미터 (필요시 추가) -->
+    <param name="lane_detection_topic" value="/lane_detection/centerline"/>
+    <param name="camera_topic" value="/camera/image_raw"/>
+  </node>
+
+</launch> -->

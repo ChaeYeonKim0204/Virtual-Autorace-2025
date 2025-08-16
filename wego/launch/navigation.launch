@@ -10,5 +10,5 @@
     <include file="$(find wego_2d_nav)/launch/move_base.launch"/>
 
 
-    <node pkg="wego" type="navigation_client.py" name="navigation_client"/>
+    <!-- <node pkg="wego" type="navigation_client.py" name="navigation_client"/> -->
 </launch>

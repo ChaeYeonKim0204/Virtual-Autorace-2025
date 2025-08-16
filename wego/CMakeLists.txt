@@ -11,11 +11,21 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
 )
 
+add_message_files(
+  FILES
+  obstacle.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES tf_pkg
-#  CATKIN_DEPENDS roscpp rospy
+#  CATKIN_DEPENDS roscpp rospy message_runtime std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
