@@ -8,7 +8,7 @@ map_type: costmap
 
 inflation_layer:
   enabled: true
-  cost_scaling_factor: 13.0
+  cost_scaling_factor: 1.0
   inflation_radius: 0.25
   inflation_unknow: true
 
