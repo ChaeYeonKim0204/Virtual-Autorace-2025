@@ -15,8 +15,8 @@
 
         <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
         <rosparam file="$(find wego_2d_nav)/params/teb_local_planner_params.yaml" command="load" ns="TebLocalPlannerROS"/>
-        <param name="controller_frequency" value="10.0"/>
-        <param name="controller_patience" value="7.0"/>
+        <param name="controller_frequency" value="20.0"/>
+        <param name="controller_patience" value="2.0"/>
 
         <param name="clearing_rotation_allowed" value="false"/>
         <remap from="odom" to="/odometry/filtered"/>

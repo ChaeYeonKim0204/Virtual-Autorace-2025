@@ -52,6 +52,6 @@ TebLocalPlannerRos:
   weight_max_vel_theta: 0.5
   weight_acc_lim_x: 1
   weight_acc_lim_theta: 1
-  weight_kinematics_nh: 1000
+  weight_kinematics_nh: 200
   weight_kinematics_forward_drive: 1  
   
