@@ -13,7 +13,6 @@ catkin_package()
 catkin_install_python(
   PROGRAMS
     script/lane_following_node.py
-    script/mgeo_pub.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
