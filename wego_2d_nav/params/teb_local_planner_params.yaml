@@ -1,4 +1,4 @@
-TebLocalPlannerRos:
+TebLocalPlannerROS:
 
   odom_topic: /odometry/filtered
   map_frame: map

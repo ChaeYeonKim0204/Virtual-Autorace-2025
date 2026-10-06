@@ -4,6 +4,8 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from actionlib_msgs.msg import GoalStatus
 import actionlib
 import math
+import os
+import rospkg
 import pandas as pd
 from geometry_msgs.msg import PoseWithCovarianceStamped
 
@@ -18,8 +20,8 @@ class NavigationClient_Maze:
         self.waypoint2.target_pose.header.frame_id = 'map'
         self.waypoint2.target_pose.pose.position.x = 19.89
         self.waypoint2.target_pose.pose.position.y = -9.998
-        self.waypoint2.target_pose.pose.orientation.w = 0.015066
-        self.waypoint2.target_pose.pose.orientation.z = 0.999886
+        self.waypoint2.target_pose.pose.orientation.z = 0.015066
+        self.waypoint2.target_pose.pose.orientation.w = 0.999886
         self.goal_list.append(self.waypoint2)
         
         self.sequence = 0
@@ -76,7 +78,8 @@ def get_pose():
 
 def main():
     rospy.init_node('navigation_switcher')
-    road_waypoint_file = '~/ws/waypoint_1m.csv'
+    default_waypoints = os.path.join(rospkg.RosPack().get_path('wego'), 'waypoints', 'waypoint_1m.csv')
+    road_waypoint_file = rospy.get_param('~road_waypoint_file', default_waypoints)
 
     maze_client = NavigationClient_Maze()
     road_client = NavigationClient_Road(road_waypoint_file)
@@ -92,7 +95,7 @@ def main():
         x, y, z, w = get_pose()
         
         # 특정 좌표를 지나면 Road 클라이언트로 전환
-        if abs(x - target_x) <= 1 or abs(y - target_y) <= 1:
+        if abs(x - target_x) <= 1 and abs(y - target_y) <= 1:
             change.append(1)
 
         if len(change) < 1:
