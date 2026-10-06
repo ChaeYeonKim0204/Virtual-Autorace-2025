@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>test1_0724</name>
+  <name>lane_following</name>
   <version>0.0.0</version>
-  <description>The test1_0724 package</description>
+  <description>Camera lane-following node (BEV + sliding window + PD control) and MGeo publisher</description>
 
   <maintainer email="carol@todo.todo">carol</maintainer>
   <license>TODO</license>

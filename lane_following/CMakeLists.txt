@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(test1_0724)
+project(lane_following)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy
@@ -12,7 +12,7 @@ catkin_package()
 
 catkin_install_python(
   PROGRAMS
-    script/test1_0724_node.py
+    script/lane_following_node.py
     script/mgeo_pub.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
